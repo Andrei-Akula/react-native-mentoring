@@ -8,6 +8,6 @@ export const globalStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    fontFamily: 'vinchand',
+    fontFamily: 'VINCHAND',
   }
 });

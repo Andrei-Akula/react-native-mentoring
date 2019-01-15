@@ -7,11 +7,28 @@ import { styles } from './styles';
 export default class ProductDetails extends React.Component {
 
   onPressAllProducts = () => {
-    this.props.onPressAllProducts();
+    // this.props.navigation.navigate('ProductList');
+    this.props.navigation.goBack();
   };
 
   render() {
-    const { product } = this.props;
+    const { navigation } = this.props;
+    const product = navigation.getParam('product', null);
+    
+    if (!product) {
+      return (
+        <View style={styles.mainContainer}>
+          <View style={styles.titleContainer}>
+            <Text style={[globalStyles.text, styles.title]}>Product Details</Text>
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={[globalStyles.text, styles.description]}>No data available</Text>
+          </View>
+          <Button title="All Products" onPress={this.onPressAllProducts} />
+        </View>
+      );
+    }
+
     return (
       <ScrollView>
         <View style={styles.mainContainer}>
@@ -28,6 +45,6 @@ export default class ProductDetails extends React.Component {
           <Button title="All Products" onPress={this.onPressAllProducts} />
         </View>
       </ScrollView>
-    )
+    );
   }
 };

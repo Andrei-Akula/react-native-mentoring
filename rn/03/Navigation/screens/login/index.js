@@ -1,16 +1,36 @@
 import React from 'react';
 import { Text, TextInput, View, Image, Button } from 'react-native';
+import { Buffer } from 'buffer';
 import { globalStyles } from '../../styles';
 import { styles } from './styles';
 
+function DoLogin(username, password) {
+  return fetch('https://api.github.com', {
+    headers: {
+      'Host': 'api.github.com',
+      'Authorization': 'Basic ' + new Buffer(username + ':' + password).toString('base64')
+    }
+  })
+    .then(response => response.status === 200)
+    .catch(() => false);
+}
 export default class LoginScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Welcome',
+  };
+
   state = {
     inputEmail: '',
     inputPassword: '',
   };
 
   onPressLogin = () => {
-    this.props.onLoginSuccess();
+    DoLogin(this.state.inputEmail, this.state.inputPassword)
+      .then(authenticated => {
+        if (authenticated) {
+          this.props.navigation.navigate('AppStack');
+        }
+      });
   };
 
   onEmailChange = text => {

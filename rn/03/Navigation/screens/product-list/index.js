@@ -28,10 +28,12 @@ class ProductListItem extends React.PureComponent {
 }
 
 export default class ProductList extends React.Component {
+  static navigationOptions = {
+    title: 'All Products',
+  };
 
   onPressItem = product => {
-    // Alert.alert(`onPressItem ${product.id} ${product.name}`);
-    this.props.onPressProduct(product);
+    this.props.navigation.navigate('ProductDetails', { product });
   };
 
   keyExtractor = (item, index) => `${item.id}`;
@@ -43,7 +45,7 @@ export default class ProductList extends React.Component {
     return (
       <View style={styles.mainContainer}>
         <View style={styles.titleContainer}>
-          <Text style={[globalStyles.text, styles.title]}>Product List</Text>
+          <Text style={[globalStyles.text, styles.title]}>Products</Text>
         </View>
         <View style={styles.listContainer}>
           <FlatList

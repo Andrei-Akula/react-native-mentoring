@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, FlatList, View, Alert, TouchableOpacity, Button } from 'react-native';
+import { Text, FlatList, View, ScrollView, TouchableOpacity, Button } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { products } from '../../data/products';
 import { globalStyles } from '../../styles';
@@ -28,10 +28,6 @@ class ProductListItem extends React.PureComponent {
 }
 
 export default class ProductList extends React.Component {
-  static navigationOptions = {
-    title: 'All Products',
-  };
-
   onPressItem = product => {
     this.props.navigation.navigate('ProductDetails', { product });
   };
@@ -43,18 +39,20 @@ export default class ProductList extends React.Component {
 
   render() {
     return (
-      <View style={styles.mainContainer}>
-        <View style={styles.titleContainer}>
-          <Text style={[globalStyles.text, styles.title]}>Products</Text>
+      <ScrollView>
+        <View style={styles.mainContainer}>
+          <View style={styles.titleContainer}>
+            <Text style={[globalStyles.text, styles.title]}>Products</Text>
+          </View>
+          <View style={styles.listContainer}>
+            <FlatList
+              data={products}
+              keyExtractor={this.keyExtractor}
+              renderItem={this.renderProduct}
+            />
+          </View>
         </View>
-        <View style={styles.listContainer}>
-          <FlatList
-            data={products}
-            keyExtractor={this.keyExtractor}
-            renderItem={this.renderProduct}
-          />
-        </View>
-      </View>
+      </ScrollView>
     )
   }
 };

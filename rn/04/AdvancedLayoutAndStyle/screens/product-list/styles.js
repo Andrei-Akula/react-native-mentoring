@@ -8,11 +8,8 @@ export const styles = StyleSheet.create({
     alignItems: 'stretch',
     paddingHorizontal: '5%',
   },
-  titleContainer: {
-    marginTop: 40,
-    marginBottom: 20,
-  },
   listContainer: {
+    marginTop: 10,
   },
   listItemContainer: {
   },
@@ -20,10 +17,13 @@ export const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 5,
     width: '100%',
   },
-  title: {
-    fontSize: 36,
+  listItemSeparator: {
+    height: 0.5,
+    backgroundColor: "#CED0CE",
   },
   textListItem: {
     fontSize: 24,

@@ -8,25 +8,25 @@ export const styles = StyleSheet.create({
     alignItems: 'stretch',
     paddingHorizontal: '5%',
   },
-  titleContainer: {
-    marginTop: 40,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 36,
-  },
   textContainer: {
+    marginTop: 20,
     marginBottom: 15,
+  },
+  iconLinksContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  iconLink: {
+    marginRight: 10,
   },
   nameContainer: {
     flexDirection: 'row',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   name: {
-    fontSize: 24,
-    marginLeft: 15,
+    fontSize: 32,
   },
   description: {
-    fontSize: 20
+    fontSize: 22
   }
 });

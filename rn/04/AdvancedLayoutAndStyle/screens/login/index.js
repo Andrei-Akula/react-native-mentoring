@@ -1,8 +1,10 @@
 import React from 'react';
 import { Text, TextInput, View, Image, Button } from 'react-native';
 import { Buffer } from 'buffer';
+import ModalMessage from '../../components/modal-message';
 import { globalStyles } from '../../styles';
 import { styles } from './styles';
+
 
 function DoLogin(username, password) {
   return fetch('https://api.github.com', {
@@ -16,21 +18,33 @@ function DoLogin(username, password) {
 }
 export default class LoginScreen extends React.Component {
   state = {
-    inputEmail: '',
+    inputUsername: '',
     inputPassword: '',
+    isModalVisible: false,
   };
 
+  showModal = () => {
+    this.setState({ isModalVisible: true });
+  }
+
+  closeModal = () => {
+    this.setState({ isModalVisible: false });
+  }
+
+
   onPressLogin = () => {
-    DoLogin(this.state.inputEmail, this.state.inputPassword)
+    DoLogin(this.state.inputUsername, this.state.inputPassword)
       .then(authenticated => {
         if (authenticated) {
           this.props.navigation.navigate('AppStack');
+        } else {
+          this.showModal();
         }
       });
   };
 
-  onEmailChange = text => {
-    this.setState({ inputEmail: text });
+  onUsernameChange = text => {
+    this.setState({ inputUsername: text });
   };
 
   onPasswordChange = text => {
@@ -38,7 +52,7 @@ export default class LoginScreen extends React.Component {
   };
 
   render() {
-    const areFieldsReady = this.state.inputEmail.length && this.state.inputPassword.length; 
+    const areFieldsReady = this.state.inputUsername.length && this.state.inputPassword.length; 
     return (
       <View style={styles.mainContainer}>
         <View style={styles.iamgeContainer}>
@@ -48,11 +62,11 @@ export default class LoginScreen extends React.Component {
           <Text style={[globalStyles.text, styles.textCaption]}>Friday's shop</Text>
           <View style={styles.inputContainer}>
             <TextInput
-              value={this.state.inputEmail}
-              placeholder='Your email'
-              textContentType='emailAddress'
+              value={this.state.inputUsername}
+              placeholder='Your username'
+              textContentType='username'
               style={styles.input}
-              onChangeText={this.onEmailChange}
+              onChangeText={this.onUsernameChange}
             />
             <TextInput
               value={this.state.inputPassword}
@@ -63,8 +77,16 @@ export default class LoginScreen extends React.Component {
               secureTextEntry
             />
           </View>
-          <Button title="Login" onPress={this.onPressLogin} disabled={!areFieldsReady} />
+          <Button title='Login' onPress={this.onPressLogin} disabled={!areFieldsReady} />
         </View>
+        <ModalMessage
+          visible={this.state.isModalVisible}
+          onClose={this.closeModal}
+          title='Authorization error'
+          type='error'
+        >
+          Your credentials are invalid. Please check you Github username and password.
+        </ModalMessage>
       </View>
     );
   }

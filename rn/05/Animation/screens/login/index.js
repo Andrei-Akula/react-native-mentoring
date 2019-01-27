@@ -1,7 +1,6 @@
 import React from 'react';
-import { Text, TextInput, View, Image, Button } from 'react-native';
+import { Text, TextInput, View, Image, Button, Animated, ActivityIndicator } from 'react-native';
 import { Buffer } from 'buffer';
-import ModalMessage from '../../components/modal-message';
 import { globalStyles } from '../../styles';
 import { styles } from './styles';
 
@@ -20,39 +19,89 @@ export default class LoginScreen extends React.Component {
   state = {
     inputUsername: '',
     inputPassword: '',
-    isModalVisible: false,
+    isLoginError: false,
+    isLogging: false,
   };
 
-  showModal = () => {
-    this.setState({ isModalVisible: true });
+  shakeAnim = new Animated.Value(0);
+
+  markLoginError = () => {
+    this.setState({ isLoginError: true });
   }
 
-  closeModal = () => {
-    this.setState({ isModalVisible: false });
+  clearLoginError = () => {
+    this.setState({ isLoginError: false });
   }
 
+  startLogging() {
+    this.setState({ isLogging: true });
+  }
+
+  stopLogging() {
+    this.setState({ isLogging: false });
+  }
+
+  shake = () => {
+    this.shakeAnim.setValue(0);
+    Animated.spring(this.shakeAnim, {
+      toValue: 1,
+      friction: 3,
+      tension: 10,
+      useNativeDriver: true,
+    }).start(() => {
+      this.shakeAnim.setValue(0);
+    });
+  };
 
   onPressLogin = () => {
+    this.startLogging();
     DoLogin(this.state.inputUsername, this.state.inputPassword)
       .then(authenticated => {
+        this.stopLogging();
         if (authenticated) {
           this.props.navigation.navigate('AppStack');
         } else {
-          this.showModal();
+          this.markLoginError();
+          this.shake();
         }
       });
   };
 
   onUsernameChange = text => {
     this.setState({ inputUsername: text });
+    this.clearLoginError();
   };
 
   onPasswordChange = text => {
     this.setState({ inputPassword: text });
+    this.clearLoginError();
   };
 
+
+
   render() {
-    const areFieldsReady = this.state.inputUsername.length && this.state.inputPassword.length; 
+    const shakeAnimated = {
+        transform: [
+          {
+            translateY: this.shakeAnim.interpolate({
+              inputRange: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+              outputRange: [0, 5, -7, 6, -4, 9, -7, 5, -5, 5, 0],
+            }),
+        },
+        {
+          translateX: this.shakeAnim.interpolate({
+            inputRange: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+            outputRange: [0, 3, -4, 5, -5, 4, -4, 5, -6, 3, 0],
+          }),
+        },
+      ],
+    };
+
+    const { inputUsername, inputPassword, isLoginError } = this.state;
+
+    const areFieldsReady = inputUsername.length && inputPassword.length;
+    const inputStyles = isLoginError ? [styles.input, styles.inputError] : styles.input;
+
     return (
       <View style={styles.mainContainer}>
         <View style={styles.iamgeContainer}>
@@ -60,33 +109,29 @@ export default class LoginScreen extends React.Component {
         </View>
         <View style={styles.textContainer}>
           <Text style={[globalStyles.text, styles.textCaption]}>Friday's shop</Text>
-          <View style={styles.inputContainer}>
+          <Animated.View style={[styles.inputContainer, shakeAnimated]}>
             <TextInput
               value={this.state.inputUsername}
               placeholder='Your username'
               textContentType='username'
-              style={styles.input}
+              style={inputStyles}
               onChangeText={this.onUsernameChange}
             />
             <TextInput
               value={this.state.inputPassword}
               placeholder='Your password'
               textContentType='password'
-              style={styles.input}
+              style={inputStyles}
               onChangeText={this.onPasswordChange}
               secureTextEntry
             />
-          </View>
-          <Button title='Login' onPress={this.onPressLogin} disabled={!areFieldsReady} />
+          </Animated.View>
+          {this.state.isLogging ? 
+            <View style={styles.loggingIndicator}><ActivityIndicator /></View>
+            : 
+            <Button title='Login' onPress={this.onPressLogin} disabled={!areFieldsReady} />
+          }
         </View>
-        <ModalMessage
-          visible={this.state.isModalVisible}
-          onClose={this.closeModal}
-          title='Authorization error'
-          type='error'
-        >
-          Your credentials are invalid. Please check you Github username and password.
-        </ModalMessage>
       </View>
     );
   }

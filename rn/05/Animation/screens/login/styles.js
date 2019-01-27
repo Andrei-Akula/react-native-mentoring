@@ -21,7 +21,6 @@ export const styles = StyleSheet.create({
     height: 100,
   },
   textCaption: {
-    // fontFamily: 'vinchand',
     fontSize: 42,
     alignItems: 'center',
     marginTop: 40,
@@ -34,5 +33,11 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#aaa',
+  },
+  inputError: {
+    borderColor: '#f00',
+  },
+  loggingIndicator: {
+    marginTop: 10,
   }
 });

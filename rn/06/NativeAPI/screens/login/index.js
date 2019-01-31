@@ -1,5 +1,8 @@
 import React from 'react';
-import { Text, TextInput, View, Image, Button, Animated, ActivityIndicator } from 'react-native';
+import {
+  Text, TextInput, View, Image, Button, Animated,
+  ActivityIndicator, AsyncStorage, Vibration
+} from 'react-native';
 import { Buffer } from 'buffer';
 import { globalStyles } from '../../styles';
 import { styles } from './styles';
@@ -15,12 +18,14 @@ function DoLogin(username, password) {
     .then(response => response.status === 200)
     .catch(() => false);
 }
+
 export default class LoginScreen extends React.Component {
   state = {
     inputUsername: '',
     inputPassword: '',
     isLoginError: false,
     isLogging: false,
+    isPasswordAutoFilled: false,
   };
 
   shakeAnim = new Animated.Value(0);
@@ -33,11 +38,15 @@ export default class LoginScreen extends React.Component {
     this.setState({ isLoginError: false });
   }
 
-  startLogging() {
+  clearAutoFilled = () => {
+    this.setState({ isPasswordAutoFilled: false });
+  }
+
+  startLogging = () => {
     this.setState({ isLogging: true });
   }
 
-  stopLogging() {
+  stopLogging = () => {
     this.setState({ isLogging: false });
   }
 
@@ -53,15 +62,32 @@ export default class LoginScreen extends React.Component {
     });
   };
 
+  loadCredentials = (username) => {
+    return AsyncStorage.getItem(username);
+  }
+
+  saveCredentials = (username, password) => {
+    return AsyncStorage.setItem(username, password);
+  }
+
   onPressLogin = () => {
+    const { inputUsername, inputPassword } = this.state;
+    const areFieldsReady = inputUsername.length && inputPassword.length;
+    // if triggered by onSubmitEditing
+    if (!areFieldsReady) {
+      return;
+    }
+
     this.startLogging();
-    DoLogin(this.state.inputUsername, this.state.inputPassword)
+    DoLogin(inputUsername, inputPassword)
       .then(authenticated => {
         this.stopLogging();
         if (authenticated) {
+          this.saveCredentials(inputUsername, inputPassword);
           this.props.navigation.navigate('AppStack');
         } else {
           this.markLoginError();
+          Vibration.vibrate(1000)
           this.shake();
         }
       });
@@ -70,14 +96,26 @@ export default class LoginScreen extends React.Component {
   onUsernameChange = text => {
     this.setState({ inputUsername: text });
     this.clearLoginError();
+    this.clearAutoFilled();
   };
 
   onPasswordChange = text => {
     this.setState({ inputPassword: text });
     this.clearLoginError();
+    this.clearAutoFilled();
   };
 
-
+  onUsernameBlur = () => {
+    this.loadCredentials(this.state.inputUsername)
+      .then(password => {
+        if (password) {
+          this.setState({
+            inputPassword: password,
+            isPasswordAutoFilled: true,
+          });
+        }
+      });
+  }
 
   render() {
     const shakeAnimated = {
@@ -100,7 +138,12 @@ export default class LoginScreen extends React.Component {
     const { inputUsername, inputPassword, isLoginError } = this.state;
 
     const areFieldsReady = inputUsername.length && inputPassword.length;
-    const inputStyles = isLoginError ? [styles.input, styles.inputError] : styles.input;
+    let inputStyles = [styles.input];
+    if (isLoginError) {
+      inputStyles = [...inputStyles, styles.inputError];
+    } else if (this.state.isPasswordAutoFilled) {
+      inputStyles = [...inputStyles, styles.inputAutoFilled];
+    }
 
     return (
       <View style={styles.mainContainer}>
@@ -111,11 +154,14 @@ export default class LoginScreen extends React.Component {
           <Text style={[globalStyles.text, styles.textCaption]}>Friday's shop</Text>
           <Animated.View style={[styles.inputContainer, shakeAnimated]}>
             <TextInput
-              value={this.state.inputUsername}
+              value={inputUsername}
               placeholder='Your username'
               textContentType='username'
               style={inputStyles}
               onChangeText={this.onUsernameChange}
+              autoComplete='username'
+              autoCorrect={false}
+              onBlur={this.onUsernameBlur}
             />
             <TextInput
               value={this.state.inputPassword}
@@ -124,6 +170,10 @@ export default class LoginScreen extends React.Component {
               style={inputStyles}
               onChangeText={this.onPasswordChange}
               secureTextEntry
+              autoComplete='off'
+              autoCorrect={false}
+              onSubmitEditing={this.onPressLogin}
+              editable={!!inputUsername.length}
             />
           </Animated.View>
           {this.state.isLogging ?

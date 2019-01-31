@@ -33,9 +33,13 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#aaa',
+    backgroundColor: '#fff',
   },
   inputError: {
     borderColor: '#f00',
+  },
+  inputAutoFilled: {
+    backgroundColor: '#fbffe2',
   },
   loggingIndicator: {
     marginTop: 10,

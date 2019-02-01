@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, FlatList, View, ScrollView, TouchableOpacity, Button } from 'react-native';
+import { Text, FlatList, View, ScrollView, TouchableOpacity, Vibration } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ModalMessage from '../../components/modal-message';
 import { globalStyles } from '../../styles';
@@ -59,6 +59,7 @@ export default class ProductList extends React.Component {
         });
       })
       .catch(() => {
+        Vibration.vibrate(1000)
         this.showModal();
       });
   }

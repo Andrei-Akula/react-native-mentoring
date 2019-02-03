@@ -1,9 +1,12 @@
 # Clone a new exercise project
 
+## 0. make dir and init new react native  project
+`react-native init projName`
+
 ## 1. copy folders
 
 assets
-data
+components
 screens
 styles
 

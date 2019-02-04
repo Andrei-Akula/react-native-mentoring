@@ -4,6 +4,7 @@ import {
   ActivityIndicator, AsyncStorage, Vibration
 } from 'react-native';
 import { Buffer } from 'buffer';
+import SplashScreen from 'react-native-splash-screen'
 import { globalStyles } from '../../styles';
 import { styles } from './styles';
 
@@ -29,6 +30,10 @@ export default class LoginScreen extends React.Component {
   };
 
   shakeAnim = new Animated.Value(0);
+
+  componentDidMount() {
+    setTimeout(() => SplashScreen.hide(), 1000);
+  }
 
   markLoginError = () => {
     this.setState({ isLoginError: true });
